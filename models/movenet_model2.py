@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import cv2
-from helper import _keypoints_and_edges_for_display, to_gif, draw_prediction_on_image, \
+from models.helper import _keypoints_and_edges_for_display, to_gif, draw_prediction_on_image, \
     init_crop_region, determine_crop_region, run_inference, crop_and_resize, determine_torso_and_body_range, \
     torso_visible
 import os
@@ -61,8 +61,7 @@ def predict_movenet_for_video(video_path):
             keypoints_with_scores = run_inference(
                 movenet, frame, crop_region,
                 crop_size=[input_size, input_size])
-
-            output_keypoints.append(keypoints_with_scores)
+            output_keypoints.append(keypoints_with_scores[0][0])
 
             # For GIF Visualization
             output_images.append(draw_prediction_on_image(
@@ -91,14 +90,4 @@ def predict_movenet_for_video(video_path):
     print("Frame count : ", frame_count)
 
     return output_keypoints
-
-
-if __name__ == "__main__":
-
-    video_path = "test\IMG-20240405-WA0024.jpg"
-    output_keypoints = predict_movenet_for_video(video_path)
-    print(output_keypoints)
-
-    if output_keypoints is not None:    
-        print("Converted to Gif Successfully")
   
