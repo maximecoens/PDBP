@@ -131,7 +131,7 @@ def predict_movenet_for_webcam():
     output_images = []
     output_keypoints = []
     
-    while cap.isOpened():
+    while (True):
         
         ret, frame = cap.read()
 
@@ -151,19 +151,19 @@ def predict_movenet_for_webcam():
             output_keypoints.append(keypoints_with_scores[0][0])
 
             # hier komt code voor comparison en state bijhouden
-            #cossim = compare2(keypoints_with_scores[0][0], states[0])
-            #print(cossim)
+            cossim = compare2(keypoints_with_scores[0][0], states[0])
+            print(cossim)
 
             # For GIF Visualization TODO: bekijk voor real-time visualization
-            output_images.append(draw_prediction_on_image(
-                frame.astype(np.int32),
-                keypoints_with_scores, crop_region=None,
-                close_figure=True, output_image_height=300))
+            #output_images.append(draw_prediction_on_image(
+            #    frame.astype(np.int32),
+            #    keypoints_with_scores, crop_region=None,
+            #    close_figure=True, output_image_height=300))
 
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
 
-            output = np.stack(output_images, axis=0)
+            #output = np.stack(output_images, axis=0)
 
             frame_count += 1
             if cv2.waitKey(1) & 0xFF == ord('q'): 
