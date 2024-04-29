@@ -9,7 +9,6 @@ def compare(correctFrame, current_state, exercise):
   # kijken welke oefening met switch
   if exercise == 'upperhand_bicep_curl':
     return compare_bovenhandsecurl(correctFrame, current_state)
-
 keypoints_input = []
 
 def compare_bovenhandsecurl(correctFrame, current_state):
@@ -31,5 +30,5 @@ def compare_bovenhandsecurl(correctFrame, current_state):
     score_next += np.dot(correctFrame[coord][:2], states[current_state + 1][coord][:2]) / (norm(correctFrame[coord][:2])*norm(states[current_state + 1][coord][:2]))
   score_current = np.arctanh(score_current/6)
   score_next = np.arctanh(score_next / 6)
-  
+
   return score_current, score_next
