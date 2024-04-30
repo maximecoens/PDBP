@@ -22,12 +22,13 @@ def compare_bovenhandsecurl(correctFrame, current_state):
     return 1
 
   # calculate cosine similarity score for 6 keypoints (30FPS)
-    
   score_current = 0
   score_next = 0
   for coord in range(5, 11):
     score_current += np.dot(correctFrame[coord][:2], states[current_state][coord][:2]) / (norm(correctFrame[coord][:2])*norm(states[current_state][coord][:2]))
     score_next += np.dot(correctFrame[coord][:2], states[current_state + 1][coord][:2]) / (norm(correctFrame[coord][:2])*norm(states[current_state + 1][coord][:2]))
+  # Ignore divide by zero warnings (when score is 6 = when body position is equal)
+  np.seterr(divide='ignore')
   score_current = np.arctanh(score_current/6)
   score_next = np.arctanh(score_next / 6)
 

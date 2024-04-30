@@ -11,6 +11,7 @@ from exercises.compares import compare
 
 current_state = 0
 wrong_states = 0
+duration_states = 0
 
 def predict_movenet_for_video(video_path, exercise):
     model_name = "movenet_lightning"
@@ -48,7 +49,6 @@ def predict_movenet_for_video(video_path, exercise):
     # Initialize the frame count
     frame_count = 0
 
-    output_images = []
     output_keypoints = []
     # waar bijhouden?
     current_state = 0
@@ -71,15 +71,19 @@ def predict_movenet_for_video(video_path, exercise):
             output_keypoints.append(keypoints_with_scores[0][0])
 
             # Compare frame
-            similarity_score = compare(keypoints_with_scores[0][0], current_state)
-            if similarity_score > 0.1: # een grenswaarde zoeken
+            # TODO: this
+            similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
+            # als score dichter ligt bij next dan is het de volgende state
+            if similarity_score_next > similarity_score_current & similarity_score_next > 0.1: # een grenswaarde zoeken
                 current_state += 1
                 wrong_states = 0
-            else:
-                wrong_states += 1
-            if wrong_states > 10: # een waarde zoeken
+                duration_states = 0
+            elif similarity_score_current > 0.1:
+                duration_states += 1
+            if wrong_states > 10 & current_state != 0: # een waarde zoeken
                 print("exit dit hele programma als fout")
-            # manier vinden voor aantal frames te wachten vooralleer het als fout beschouwd wordt
+            if duration_states > 10 & current_state != 0:
+                print("duurt te lang tussen 2 states (te traag)")
 
             """ # For GIF Visualization
             output_images.append(draw_prediction_on_image(
@@ -115,7 +119,7 @@ current_state = 0
 wrong_states = 0
 duration_states = 0
 
-def predict_movenet_for_webcam(exersice):
+def predict_movenet_for_webcam(exercise):
     model_name = "movenet_lightning"
     interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
     input_size = 192 
@@ -151,7 +155,6 @@ def predict_movenet_for_webcam(exersice):
     # Initialize the frame count
     frame_count = 0
 
-    output_images = []
     output_keypoints = []
     
     while (True):
@@ -175,7 +178,7 @@ def predict_movenet_for_webcam(exersice):
 
             # Compare frame
             # TODO: this
-            similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exersice)
+            similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
             # als score dichter ligt bij next dan is het de volgende state
             if similarity_score_next > similarity_score_current & similarity_score_next > 0.1: # een grenswaarde zoeken
                 current_state += 1

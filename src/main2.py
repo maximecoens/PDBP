@@ -11,7 +11,7 @@ print("CHOOSE EXERCISE: BOVENHANDSE BICEP CURL")
 exercise = "upperhand_bicep_curl"
 
 # webcam opzetten + nodige dingen doen ter voorbereiding oefening.
-video_path = "src\/testdata\BovCurlCorrect\/fr90graden.jpg"
+video_path = "src\/testdata\JuisteBewNaud.gif"
 
 # feedback via oefening
 if exercise == "upperhand_bicep_curl":

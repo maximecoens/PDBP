@@ -346,7 +346,7 @@ fr_90graden = [[0.13395222, 0.51518583, 0.22280698],
 
 result = 0
 for coord in range(5, 11):
-  result += np.dot(fr_60graden[coord][:2], fr_90graden[coord][:2])/(norm(fr_60graden[coord][:2])*norm(fr_90graden[coord][:2]))
+  result += np.dot(foto1[coord][:2], foto2[coord][:2])/(norm(foto1[coord][:2])*norm(foto2[coord][:2]))
 
 print('result: ', result/6)
 
