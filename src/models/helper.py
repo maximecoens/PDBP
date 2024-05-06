@@ -351,7 +351,7 @@ def draw_prediction_on_image(
          interpolation=cv2.INTER_CUBIC)
   return image_from_plot
 
-def to_gif(images, fps):
+def to_gif(images, exercise, fps):
   """Converts image sequence (4D numpy array) to gif."""
   imageio.mimsave('outputgifs', images, fps=fps)
-  return embed.embed_file('./animation.gif')
+  return embed.embed_file(f'./{exercise}.gif')

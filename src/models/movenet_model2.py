@@ -12,8 +12,9 @@ from exercises.compares import compare
 current_state = 0
 wrong_states = 0
 duration_states = 0
+output_images = []
 
-def predict_movenet_for_video(video_path, exercise):
+def predict_movenet_for_video(video_path, exercise, new):
     model_name = "movenet_lightning"
     interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
     input_size = 192 
@@ -51,7 +52,7 @@ def predict_movenet_for_video(video_path, exercise):
 
     output_keypoints = []
     # waar bijhouden?
-    current_state = 0
+    #current_state = 0
     
     while cap.isOpened():
         
@@ -69,9 +70,8 @@ def predict_movenet_for_video(video_path, exercise):
                 movenet, frame, crop_region,
                 crop_size=[input_size, input_size])
             output_keypoints.append(keypoints_with_scores[0][0])
-
+            """
             # Compare frame
-            # TODO: this
             similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
             # als score dichter ligt bij next dan is het de volgende state
             if similarity_score_next > similarity_score_current & similarity_score_next > 0.1: # een grenswaarde zoeken
@@ -84,13 +84,13 @@ def predict_movenet_for_video(video_path, exercise):
                 print("exit dit hele programma als fout")
             if duration_states > 10 & current_state != 0:
                 print("duurt te lang tussen 2 states (te traag)")
-
-            """ # For GIF Visualization
+            
+            # For GIF Visualization
             output_images.append(draw_prediction_on_image(
                 frame.astype(np.int32),
                 keypoints_with_scores, crop_region=None,
-                close_figure=True, output_image_height=300)) """
-
+                close_figure=True, output_image_height=300))
+            """
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
 
@@ -107,17 +107,14 @@ def predict_movenet_for_video(video_path, exercise):
     cv2.destroyAllWindows()
     
     # will be stored as animation.gif
-    #to_gif(output, fps=10)
+    #to_gif(output, "upperhand_bicep_curl", fps=10)
+
+    if new == "new":
+        np.save(f'src\exercises\{exercise}.npy', output_keypoints)
     
     print("Frame count : ", frame_count)
 
     return output_keypoints
-
-
-
-current_state = 0
-wrong_states = 0
-duration_states = 0
 
 def predict_movenet_for_webcam(exercise):
     model_name = "movenet_lightning"
@@ -156,6 +153,9 @@ def predict_movenet_for_webcam(exercise):
     frame_count = 0
 
     output_keypoints = []
+    current_state = 0
+    wrong_states = 0
+    duration_states = 0 
     
     while (True):
         
@@ -180,15 +180,17 @@ def predict_movenet_for_webcam(exercise):
             # TODO: this
             similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
             # als score dichter ligt bij next dan is het de volgende state
-            if similarity_score_next > similarity_score_current & similarity_score_next > 0.1: # een grenswaarde zoeken
+            if similarity_score_next > similarity_score_current and similarity_score_next > 2.5: # een grenswaarde zoeken
                 current_state += 1
                 wrong_states = 0
                 duration_states = 0
-            elif similarity_score_current > 0.1:
+            elif similarity_score_current > 2.5:
+                wrong_states += 1
+            else: 
                 duration_states += 1
-            if wrong_states > 10 & current_state != 0: # een waarde zoeken
+            if wrong_states > 10 and current_state != 0: # een waarde zoeken
                 print("exit dit hele programma als fout")
-            if duration_states > 10 & current_state != 0:
+            if duration_states > 10 and current_state != 0:
                 print("duurt te lang tussen 2 states (te traag)")
 
             # Crops the image for model 

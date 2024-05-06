@@ -15,7 +15,6 @@ Correcte testvideo opnemen
 
 ## Schrijven
 
-- voorwoord
 - model bespreken
 - werking & manier van similariteit berekenen
 - Hoe getest en hoe data ingelezen
