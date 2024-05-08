@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from numpy.linalg import norm
 from models.movenet_model2 import predict_movenet_for_video, predict_movenet_for_webcam
+import re
 
 
 print(71*'*')
@@ -38,11 +39,12 @@ def choose_ex():
 def upload_new():
     print("Upload new exercise.")
     print("Name of Exersice:")
-    # TODO => maak generiek
-    #name_ex = str(input())
+    name_ex = str(input())
+    name_ex = re.sub(" ", "_", name_ex.lower)
     print("Path to video:")
     video_path = str(input())
-    output_keypoints = predict_movenet_for_video(video_path, "upperhand_bicep_curl", "new")
+    output_keypoints = predict_movenet_for_video(video_path, name_ex, "new")
+    np.save(f'src\exercises\{name_ex}.npy', output_keypoints)
 
 option = int(input())
 match option:

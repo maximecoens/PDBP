@@ -14,7 +14,7 @@ wrong_states = 0
 duration_states = 0
 output_images = []
 
-def predict_movenet_for_video(video_path, exercise, new):
+def predict_movenet_for_video(video_path, exercise):
     model_name = "movenet_lightning"
     interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
     input_size = 192 
@@ -84,17 +84,17 @@ def predict_movenet_for_video(video_path, exercise, new):
                 print("exit dit hele programma als fout")
             if duration_states > 10 & current_state != 0:
                 print("duurt te lang tussen 2 states (te traag)")
-            
+            """
             # For GIF Visualization
             output_images.append(draw_prediction_on_image(
                 frame.astype(np.int32),
                 keypoints_with_scores, crop_region=None,
                 close_figure=True, output_image_height=300))
-            """
+            
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
 
-            #output = np.stack(output_images, axis=0)
+            output = np.stack(output_images, axis=0)
 
             frame_count += 1
 
@@ -106,11 +106,8 @@ def predict_movenet_for_video(video_path, exercise, new):
     # Closes all the frames
     cv2.destroyAllWindows()
     
-    # will be stored as animation.gif
-    #to_gif(output, "upperhand_bicep_curl", fps=10)
-
-    if new == "new":
-        np.save(f'src\exercises\{exercise}.npy', output_keypoints)
+    # will be stored as a gif
+    to_gif(output, exercise, fps=10)
     
     print("Frame count : ", frame_count)
 
