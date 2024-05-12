@@ -46,6 +46,8 @@ def upload_new():
     output_keypoints = predict_movenet_for_video(video_path, name_ex, "new")
     np.save(f'src\exercises\{name_ex}.npy', output_keypoints)
 
+
+
 option = int(input())
 match option:
     case 1:

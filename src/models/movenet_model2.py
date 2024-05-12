@@ -175,25 +175,27 @@ def predict_movenet_for_webcam(exercise):
 
             # Compare frame
             # TODO: this
-            similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
-            # als score dichter ligt bij next dan is het de volgende state
-            if similarity_score_next > similarity_score_current and similarity_score_next > 2.5: # een grenswaarde zoeken
-                current_state += 1
-                wrong_states = 0
-                duration_states = 0
-            elif similarity_score_current > 2.5:
-                wrong_states += 1
-            else: 
-                duration_states += 1
-            if wrong_states > 10 and current_state != 0: # een waarde zoeken
-                print("exit dit hele programma als fout")
-            if duration_states > 10 and current_state != 0:
-                print("duurt te lang tussen 2 states (te traag)")
+            if frame_count % 15 == 0:
+                similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
+                # als score dichter ligt bij next dan is het de volgende state
+                if similarity_score_next > similarity_score_current and similarity_score_next > 2.5: # een grenswaarde zoeken
+                    current_state += 1
+                    wrong_states = 0
+                    duration_states = 0
+                    print("next state")
+                elif similarity_score_current < 2.5:
+                    print("foute score")
+                    wrong_states += 1
+                else: 
+                    #duration_states += 1
+                    print("ok")
+                if wrong_states > 10 and current_state != 0: # een waarde zoeken
+                    print("exit dit hele programma als fout")
+                if duration_states > 10 and current_state != 0:
+                    print("duurt te lang tussen 2 states (te traag)")
 
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
-
-            #output = np.stack(output_images, axis=0)
 
             frame_count += 1
             if cv2.waitKey(1) & 0xFF == ord('q'): 
@@ -205,9 +207,6 @@ def predict_movenet_for_webcam(exercise):
     cap.release()
     # Closes all the frames
     cv2.destroyAllWindows()
-    
-    # will be stored as animation.gif
-    #to_gif(output, fps=10)
     
     print("Frame count : ", frame_count)
 

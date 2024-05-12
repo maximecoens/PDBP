@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy.linalg import norm
+import cv2
 
 
 def compare(inputFrame, current_state, exercise):
@@ -35,4 +36,16 @@ def compare_bovenhandsecurl(inputFrame, current_state):
   # TODO: weight aan meegeven
   # TODO: specifiekere feedback meegeven! => rechte hoek tussen armen enzo
   # TODO: reps weergeven en vragen
+
+  # paths to correct exersice pictures
+  correct_exersices = ["src\/testdata\UpCurlCorrect\state1.jpg", "src\/testdata\UpCurlCorrect\state2.jpg", "src\/testdata\UpCurlCorrect\state3.jpg", "src\/testdata\UpCurlCorrect\state4.jpg", "src\/testdata\UpCurlCorrect\state5.jpg"]
+  correct_state = 0
+
+  # open images view
+  # TODO: fix correct_state += 1
+  image = cv2.imread(correct_exersices[correct_state])
+  image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
+  cv2.imshow("Correct exercise", image)
+  # cv2.waitKey(0)
+
   return score_current, score_next
