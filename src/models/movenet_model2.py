@@ -113,7 +113,7 @@ def predict_movenet_for_video(video_path, exercise):
 
     return output_keypoints
 
-def predict_movenet_for_webcam(exercise):
+def predict_movenet_for_webcam(exercise, reps_count):
     model_name = "movenet_lightning"
     interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
     input_size = 192 
@@ -153,6 +153,7 @@ def predict_movenet_for_webcam(exercise):
     current_state = 0
     wrong_states = 0
     duration_states = 0 
+    reps = 0
     
     while (True):
         
@@ -176,7 +177,7 @@ def predict_movenet_for_webcam(exercise):
             # Compare frame
             # TODO: this
             if frame_count % 15 == 0:
-                similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
+                similarity_score_current, similarity_score_next, reps = compare(keypoints_with_scores[0][0], current_state, exercise, reps)
                 # als score dichter ligt bij next dan is het de volgende state
                 if similarity_score_next > similarity_score_current and similarity_score_next > 2.5: # een grenswaarde zoeken
                     current_state += 1
@@ -193,6 +194,10 @@ def predict_movenet_for_webcam(exercise):
                     print("exit dit hele programma als fout")
                 if duration_states > 10 and current_state != 0:
                     print("duurt te lang tussen 2 states (te traag)")
+                print("REPS: ", reps)
+            if reps == reps_count:
+                print("Oefening voltooid")
+                break
 
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)

@@ -32,7 +32,9 @@ def choose_ex():
     exercise = int(input())
     match exercise:
         case 1:
-            output_keypoints = predict_movenet_for_webcam("upperhand_bicep_curl")
+            print("How many repetitions: ")
+            count_reps = int(input())
+            output_keypoints = predict_movenet_for_webcam("upperhand_bicep_curl", count_reps)
         case _:
             print("INVALID OPTION")
 

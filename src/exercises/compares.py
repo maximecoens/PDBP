@@ -5,13 +5,13 @@ from numpy.linalg import norm
 import cv2
 
 
-def compare(inputFrame, current_state, exercise):
+def compare(inputFrame, current_state, exercise, reps):
   # kijken welke oefening met switch
   if exercise == 'upperhand_bicep_curl':
-    return compare_bovenhandsecurl(inputFrame, current_state)
+    return compare_bovenhandsecurl(inputFrame, current_state, reps)
 keypoints_input = []
 
-def compare_bovenhandsecurl(inputFrame, current_state):
+def compare_bovenhandsecurl(inputFrame, current_state, reps):
   """ return code 0 is True (juiste beweging)
       return code 1 is False (laatste state)
       return code 2 is False (foute beweging)"""
@@ -23,6 +23,7 @@ def compare_bovenhandsecurl(inputFrame, current_state):
   if current_state + delta >= len(states):
     return 1
 
+  """
   # calculate cosine similarity score for 6 keypoints (30FPS)
   score_current = 0
   score_next = 0
@@ -36,6 +37,7 @@ def compare_bovenhandsecurl(inputFrame, current_state):
   # TODO: weight aan meegeven
   # TODO: specifiekere feedback meegeven! => rechte hoek tussen armen enzo
   # TODO: reps weergeven en vragen
+  """
 
   # paths to correct exersice pictures
   correct_ex_jpg = ["src\/testdata\/UpCurlCorrect\state1.jpg", "src\/testdata\/UpCurlCorrect\state2.jpg", "src\/testdata\/UpCurlCorrect\state3.jpg", "src\/testdata\/UpCurlCorrect\state4.jpg", "src\/testdata\/UpCurlCorrect\state5.jpg"]
@@ -124,26 +126,26 @@ def compare_bovenhandsecurl(inputFrame, current_state):
        [0.7037167 , 0.42432693, 0.6212413 ],
        [0.8079356 , 0.50011384, 0.4989962 ],
        [0.80791306, 0.4333437 , 0.37223217]]]
-  correct_state = 0
 
-  ## TODO: check voor andere keer misschien
-  score_current2 = 0
-  score_next2 = 0
-  delta = 10
+  ## TODO: Testen voor tonen van verschillende foto's
+  delta = 1
   for coord in range(5, 11):
-    score_current2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[correct_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[correct_state][coord][:2]))
-    score_next2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(correct_state + 1) % 5][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(correct_state + 1) % 5][coord][:2]))
+    score_current2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
+    score_next2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]))
   # Ignore divide by zero warnings (when score is 6, body position is exactly equal)
   np.seterr(divide='ignore')
-  score_current2 = np.arctanh(score_current2/6)
+  score_current2 = np.arctanh(score_current2 / 6)
   score_next2 = np.arctanh(score_next2 / 6)
 
   if score_current2 < score_next2:
     # open images view
     # TODO: fix correct_state += 1
-    image = cv2.imread(correct_ex_jpg[(correct_state + 1) % 5])
+    image = cv2.imread(correct_ex_jpg[(current_state + delta) % len(correct_ex_jpg)])
     image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
     cv2.imshow("Correct exercise", image)
     # cv2.waitKey(0)
+  
+  if current_state == len(correct_ex_jpg) - 1:
+    reps += 1
 
-  return score_current, score_next
+  return score_current2, score_next2, reps
