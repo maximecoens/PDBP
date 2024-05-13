@@ -10,6 +10,9 @@ def compare(inputFrame, current_state, exercise, reps):
   # kijken welke oefening met switch
   if exercise == 'upperhand_bicep_curl':
     return compare_bovenhandsecurl(inputFrame, current_state, reps)
+  else:
+    return compare_general(inputFrame, current_state, exercise, reps)
+  
 keypoints_input = []
 
 def compare_bovenhandsecurl(inputFrame, current_state, reps):
@@ -19,8 +22,11 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
   # states hier bewaren: uit een test code halen in numpy array steken.
   # TODO: unicodeescape => codec cant decode bytes
   # TODO: time delta werken, tussen current state en next state ook meer dan 10 frames?
-  states = np.load('src\exercises//upperhand_bicep_curl.npy') 
+  states = np.load('src\exercises//upperhand_bicep_curl.npy') # _delta ? zie general
   delta = 10
+  score_current = 0
+  score_next = 0
+
   if current_state + delta >= len(states):
     return 1
 
@@ -30,17 +36,17 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
   images = [image for image in files]
   correct_ex_jpg = [os.path.join("src/screenshots/upperhand_bicep_curl", image) for image in images]
 
-  ## TODO: Testen voor tonen van verschillende foto's
+  ## TODO: Testen voor tonen van verschillende foto's + werkt dit?
   delta = 1
   for coord in range(5, 11):
-    score_current2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
-    score_next2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]))
+    score_current += np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
+    score_next += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]))
   # Ignore divide by zero warnings (when score is 6, body position is exactly equal)
   np.seterr(divide='ignore')
-  score_current2 = np.arctanh(score_current2 / 6)
-  score_next2 = np.arctanh(score_next2 / 6)
+  score_current = np.arctanh(score_current / 6)
+  score_next = np.arctanh(score_next / 6)
 
-  if score_current2 < score_next2:
+  if score_current < score_next:
     # open images view
     # TODO: fix correct_state += 1 ??
     image = cv2.imread(correct_ex_jpg[(current_state + delta) % len(correct_ex_jpg)])
@@ -51,4 +57,54 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
   if current_state == len(correct_ex_jpg) - 1:
     reps += 1
 
-  return score_current2, score_next2, reps
+  return score_current, score_next, reps
+
+
+## TODO: kijken of het werkt voor een general werking met 17 keypoints! => al zittend niet mogelijk
+## mogelijks keypoints weergeven?
+## TODO: reps
+
+def compare_general(inputFrame, current_state, exercise, reps):
+  """ return code 0 is True (juiste beweging)
+      return code 1 is False (laatste state)
+      return code 2 is False (foute beweging)"""
+  # states hier bewaren: uit een test code halen in numpy array steken.
+  # TODO: unicodeescape => codec cant decode bytes
+  # TODO: time delta werken, tussen current state en next state ook meer dan 10 frames?
+  states = np.load(f'src\exercises//{exercise}_delta.npy') 
+  delta = 1
+  score_current = 0
+  score_next = 0
+
+  if current_state + delta >= len(states):
+    return 1
+
+  # paths to correct exersice pictures
+  correct_ex_keypoints = np.load(f'src\exercises\/{exercise}.npy') 
+  files = os.listdir(f'src/screenshots\/{exercise}')
+  images = [image for image in files]
+  correct_ex_jpg = [os.path.join(f"src/screenshots\/{exercise}", image) for image in images]
+
+  ## TODO: Testen voor tonen van verschillende foto's + werkt dit?
+  delta = 1
+  # TODO: werken met default 17 keypoints? of vragen welke
+  for coord in range(0,17):
+    score_current += np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
+    score_next += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]))
+  # Ignore divide by zero warnings (when score is 6, body position is exactly equal)
+  np.seterr(divide='ignore')
+  score_current = np.arctanh(score_current / 17)
+  score_next = np.arctanh(score_next / 17)
+
+  if score_current < score_next:
+    # open images view
+    # TODO: fix correct_state += 1 ??
+    image = cv2.imread(correct_ex_jpg[(current_state + delta) % len(correct_ex_jpg)])
+    image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
+    cv2.imshow("Correct exercise", image)
+    # cv2.waitKey(0)
+  
+  if current_state == len(correct_ex_jpg) - 1:
+    reps += 1
+
+  return score_current, score_next, reps

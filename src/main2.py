@@ -6,7 +6,7 @@ from models.movenet_model2 import predict_movenet_for_video, predict_movenet_for
 import re
 
 
-print(71*'*')
+print("***********************************************************************")
 print("                                                                       ")
 print("                 WELCOME TO POSE DETECTION APPLICATION                 ")
 print("                                                                       ")
@@ -18,7 +18,7 @@ print("        detection modellen in kinesiologische praktijken. Een onderzoek")
 print("        naar de potentiële efficiëntievergroting voor kinesisten.      ")
 print("Date:   May 2024                                                       ")
 print("                                                                       ")
-print(71*'*')
+print("***********************************************************************")
 print("                                                                       ")
 
 print("CHOOSE ACION:")
@@ -28,32 +28,41 @@ print("3. Quit")
 
 def choose_ex():
     print("Exercises: ")
-    print("1. Upperhand bicep curl")
+    exercises = np.load(f'src\exercises\/exercises.npy')
+    for i, ex in enumerate(exercises):
+        print(i + 1, f". {re.sub("_", " ", ex.capitalize())}")
     exercise = int(input())
-    match exercise:
-        case 1:
-            print("How many repetitions: ")
-            count_reps = int(input())
-            output_keypoints = predict_movenet_for_webcam("upperhand_bicep_curl", count_reps)
-        case _:
-            print("INVALID OPTION")
-            choose_ex()
+    if exercise > 0 and exercise < len(exercises):
+        print("How many repetitions: ")
+        count_reps = int(input())
+        # TODO: moet dit iets teruggeven?
+        output_keypoints = predict_movenet_for_webcam(exercises[exercise - 1], count_reps)
+    else:
+        print("INVALID OPTION")
+        choose_ex()
 
 def upload_new():
+
     print("Upload new exercise.")
-    print("Name of exercise:")
+    print("Name of exercise: ")
     name_ex = str(input())
-    name_ex = re.sub(" ", "_", name_ex.lower)
+    name_ex = re.sub(" ", "_", name_ex.lower())
+    exercises = np.load('src\exercises\exercises.npy')
+    exercises = np.append(exercises, [name_ex])
+    np.save(f'src\exercises\exercises.npy', exercises)
+
     print("Path to video:")
     video_path = str(input())
+
     # TODO: niet allemaal opslaan, om de halve second?
     print("How many seconds between 2 correct body positions: ")
     delta = float(input())
     delta = round(delta * 30)
+
+    # Gather and save keypoints
     output_keypoints = predict_movenet_for_video(video_path, name_ex, delta)
     np.save(f'src\exercises\{name_ex}.npy', output_keypoints)
     np.save(f'src\exercises\{name_ex}_delta.npy', output_keypoints[::delta])
-
 
 
 
@@ -66,6 +75,7 @@ match option:
     case 3:
         # TODO
         print("QUIT")
+        quit()
 
 
 # webcam opzetten + nodige dingen doen ter voorbereiding oefening.
