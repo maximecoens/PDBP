@@ -1,3 +1,6 @@
-import numpy as np
+import re
 
-print("HALLO".lower)
+test = str(input())
+test = [int(number) for number in test.split(" ")]
+
+print(test)

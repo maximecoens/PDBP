@@ -59,6 +59,31 @@ def upload_new():
     delta = float(input())
     delta = round(delta * 30)
 
+    # TODO: maak een deftige zin
+    print("Which keypoints are needed to focus on while detecting the body position?")
+    print("1. Nose")
+    print("2. Left eye")
+    print("3. Right eye")
+    print("4. Left ear")
+    print("5. Right ear")
+    print("6. Left shoulder")
+    print("7. Right shoulder")
+    print("8. Left elbow")
+    print("9. Right elbow")
+    print("10. Left wrist")
+    print("11. Right wrist")
+    print("12. Left hip")
+    print("13. Right hip")
+    print("14. Left knee")
+    print("15. Right knee")
+    print("16. Left ankle")
+    print("17. Right ankle")
+    print("Enter keypoint numbers with space in between: ")
+    ex_keypoints = str(input())
+    # TODO: hoe doorgeven aan compare? => via nmpy bijhouden, kan sws maar is dit best?
+    ex_keypoints = [int(number) for number in ex_keypoints.split(" ")]
+
+
     # Gather and save keypoints
     output_keypoints = predict_movenet_for_video(video_path, name_ex, delta)
     np.save(f'src\exercises\{name_ex}.npy', output_keypoints)
