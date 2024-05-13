@@ -14,7 +14,7 @@ wrong_states = 0
 duration_states = 0
 output_images = []
 
-def predict_movenet_for_video(video_path, exercise):
+def predict_movenet_for_video(video_path, exercise, delta):
     model_name = "movenet_lightning"
     interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
     input_size = 192 
@@ -49,9 +49,10 @@ def predict_movenet_for_video(video_path, exercise):
     cap = cv2.VideoCapture(video_path)
     # Initialize the frame count
     frame_count = 0
+    # Initialize frames per second
+    fps = 30
 
     output_keypoints = []
-    # waar bijhouden?
     #current_state = 0
     
     while cap.isOpened():
@@ -70,21 +71,15 @@ def predict_movenet_for_video(video_path, exercise):
                 movenet, frame, crop_region,
                 crop_size=[input_size, input_size])
             output_keypoints.append(keypoints_with_scores[0][0])
-            """
-            # Compare frame
-            similarity_score_current, similarity_score_next = compare(keypoints_with_scores[0][0], current_state, exercise)
-            # als score dichter ligt bij next dan is het de volgende state
-            if similarity_score_next > similarity_score_current & similarity_score_next > 0.1: # een grenswaarde zoeken
-                current_state += 1
-                wrong_states = 0
-                duration_states = 0
-            elif similarity_score_current > 0.1:
-                duration_states += 1
-            if wrong_states > 10 & current_state != 0: # een waarde zoeken
-                print("exit dit hele programma als fout")
-            if duration_states > 10 & current_state != 0:
-                print("duurt te lang tussen 2 states (te traag)")
-            """
+            
+            # Check if it's time to capture a screenshot
+            if frame_count % (fps * delta) == 0:
+                # Save the screenshot
+                screenshot_path = os.path.join(f'src/screenshots/{exercise}/screenshot_{frame_count}.jpg')
+                cv2.imwrite(screenshot_path, frame)
+                print(f'Saved screenshot: {screenshot_path}')
+                
+
             # For GIF Visualization
             output_images.append(draw_prediction_on_image(
                 frame.astype(np.int32),

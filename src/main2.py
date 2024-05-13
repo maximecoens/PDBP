@@ -37,16 +37,23 @@ def choose_ex():
             output_keypoints = predict_movenet_for_webcam("upperhand_bicep_curl", count_reps)
         case _:
             print("INVALID OPTION")
+            choose_ex()
 
 def upload_new():
     print("Upload new exercise.")
-    print("Name of Exersice:")
+    print("Name of exercise:")
     name_ex = str(input())
     name_ex = re.sub(" ", "_", name_ex.lower)
     print("Path to video:")
     video_path = str(input())
-    output_keypoints = predict_movenet_for_video(video_path, name_ex, "new")
+    # TODO: niet allemaal opslaan, om de halve second?
+    print("How many seconds between 2 correct body positions: ")
+    delta = float(input())
+    delta = round(delta * 30)
+    output_keypoints = predict_movenet_for_video(video_path, name_ex, delta)
     np.save(f'src\exercises\{name_ex}.npy', output_keypoints)
+    np.save(f'src\exercises\{name_ex}_delta.npy', output_keypoints[::delta])
+
 
 
 
