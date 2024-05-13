@@ -36,7 +36,8 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
   images = [image for image in files]
   correct_ex_jpg = [os.path.join("src/screenshots/upperhand_bicep_curl", image) for image in images]
 
-  ## TODO: Testen voor tonen van verschillende foto's + werkt dit?
+  ## TODO: Testen voor tonen van verschillende foto's + werkt dit? => testen
+  # TODO: checken voor specifieke feedback
   delta = 1
   for coord in range(5, 11):
     score_current += np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))

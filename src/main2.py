@@ -13,9 +13,9 @@ print("                                                                       ")
 print("       An application born from my Bachelor's thesis at HoGent.        ")
 print("                                                                       ")
 print("Name:   Maxime Coens                                                   ")
-print("Title:  Optimalisatie van lichaamsbewegingen door integratie van pose  ")
-print("        detection modellen in kinesiologische praktijken. Een onderzoek")
-print("        naar de potentiële efficiëntievergroting voor kinesisten.      ")
+print("Title:  Optimization of body movements through integration of pose     ")
+print("        detection models in kinesiology practices. An examination of   ")
+print("        potential efficiency gains for kinesiologists.                 ")
 print("Date:   May 2024                                                       ")
 print("                                                                       ")
 print("***********************************************************************")
@@ -54,13 +54,12 @@ def upload_new():
     print("Path to video:")
     video_path = str(input())
 
-    # TODO: niet allemaal opslaan, om de halve second?
     print("How many seconds between 2 correct body positions: ")
     delta = float(input())
     delta = round(delta * 30)
 
-    # TODO: maak een deftige zin
     print("Which keypoints are needed to focus on while detecting the body position?")
+    print("0. All keypoints!")
     print("1. Nose")
     print("2. Left eye")
     print("3. Right eye")
@@ -80,8 +79,12 @@ def upload_new():
     print("17. Right ankle")
     print("Enter keypoint numbers with space in between: ")
     ex_keypoints = str(input())
-    # TODO: hoe doorgeven aan compare? => via nmpy bijhouden, kan sws maar is dit best?
-    ex_keypoints = [int(number) for number in ex_keypoints.split(" ")]
+    # TODO: hoe doorgeven aan compare? => via nmpy bijhouden, kan sws maar is dit best? => zo kan feedback wel
+    # TODO: kan dit voor specifieke feedback? => niet beginnen kutten in lijsten
+    if ex_keypoints == "0":
+        ex_keypoints = [number for number in range(0,17)]
+    else:
+        ex_keypoints = [int(number) - 1 for number in ex_keypoints.split(" ")]
 
 
     # Gather and save keypoints
@@ -102,9 +105,6 @@ match option:
         print("QUIT")
         quit()
 
-
-# webcam opzetten + nodige dingen doen ter voorbereiding oefening.
-#video_path = "src\/testdata\JuisteBewNaud.gif"
 
 """ # feedback via oefening
 if exercise == "upperhand_bicep_curl":
