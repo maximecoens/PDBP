@@ -132,18 +132,18 @@ def compare_bovenhandsecurl(inputFrame, current_state):
   delta = 10
   for coord in range(5, 11):
     score_current2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[correct_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[correct_state][coord][:2]))
-    score_next2 += np.dot(inputFrame[coord][:2], states[current_state + delta][coord][:2]) / (norm(inputFrame[coord][:2])*norm(states[current_state + delta][coord][:2]))
+    score_next2 += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(correct_state + 1) % 5][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(correct_state + 1) % 5][coord][:2]))
   # Ignore divide by zero warnings (when score is 6, body position is exactly equal)
   np.seterr(divide='ignore')
   score_current2 = np.arctanh(score_current2/6)
   score_next2 = np.arctanh(score_next2 / 6)
 
-  if score_current > 2.5:
-  # open images view
-  # TODO: fix correct_state += 1
-  image = cv2.imread(correct_ex_jpg[correct_state])
-  image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
-  cv2.imshow("Correct exercise", image)
-  # cv2.waitKey(0)
+  if score_current2 < score_next2:
+    # open images view
+    # TODO: fix correct_state += 1
+    image = cv2.imread(correct_ex_jpg[(correct_state + 1) % 5])
+    image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
+    cv2.imshow("Correct exercise", image)
+    # cv2.waitKey(0)
 
   return score_current, score_next
