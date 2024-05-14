@@ -52,7 +52,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
     scores_next[coord] = np.arctanh(scores_next[coord])
     np.seterr(divide='ignore')
 
-    # TODO: nu verder onderzoeken
+    # TODO: nu verder onderzoeken voor volgende keer
 
   """
       # TODO: oude versie => dit is indented, moet tab naar achter uit comments
@@ -62,7 +62,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
     np.seterr(divide='ignore')
     score_current = np.arctanh(score_current / 6)
     score_next = np.arctanh(score_next / 6)
-  """
+  """     
 
   if score_current < score_next:
     # open images view
