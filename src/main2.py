@@ -91,6 +91,7 @@ def upload_new():
     output_keypoints = predict_movenet_for_video(video_path, name_ex, delta)
     np.save(f'src\exercises\{name_ex}.npy', output_keypoints)
     np.save(f'src\exercises\{name_ex}_delta.npy', output_keypoints[::delta])
+    print(f"The new exercise {name_ex} was successfully uploaded!")
 
 
 

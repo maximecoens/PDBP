@@ -32,20 +32,37 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
 
   # paths to correct exersice pictures
   correct_ex_keypoints = np.load('src\exercises//upperhand_bicep_curl.npy') 
-  files = os.listdir(f'src/screenshots/upperhand_bicep_curl')
+  files = os.listdir(f'src/screenshots//upperhand_bicep_curl')
   images = [image for image in files]
   correct_ex_jpg = [os.path.join("src/screenshots/upperhand_bicep_curl", image) for image in images]
 
   ## TODO: Testen voor tonen van verschillende foto's + werkt dit? => testen
   # TODO: checken voor specifieke feedback
   delta = 1
+  scores_current = [0] * 20
+  scores_next = [0] * 20
   for coord in range(5, 11):
-    score_current += np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
-    score_next += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]))
-  # Ignore divide by zero warnings (when score is 6, body position is exactly equal)
-  np.seterr(divide='ignore')
-  score_current = np.arctanh(score_current / 6)
-  score_next = np.arctanh(score_next / 6)
+
+    # TODO: nog aanpassen!! score berekenen voor elk punt apart? => zo specifieke feedback?
+    scores_current[coord] = np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
+    scores_current[coord] = np.arctanh(scores_current[coord])
+    np.seterr(divide='ignore')
+
+    scores_next[coord] = np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]))
+    scores_next[coord] = np.arctanh(scores_next[coord])
+    np.seterr(divide='ignore')
+
+    # TODO: nu verder onderzoeken
+
+  """
+      # TODO: oude versie => dit is indented, moet tab naar achter uit comments
+      score_current += np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
+      score_next += np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + delta) % len(correct_ex_jpg)][coord][:2]))
+    # Ignore divide by zero warnings (when score is 6, body position is exactly equal)
+    np.seterr(divide='ignore')
+    score_current = np.arctanh(score_current / 6)
+    score_next = np.arctanh(score_next / 6)
+  """
 
   if score_current < score_next:
     # open images view
