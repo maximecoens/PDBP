@@ -53,6 +53,8 @@ def compare_bovenhandsecurl(inputFrame, current_state, reps):
     np.seterr(divide='ignore')
 
     # TODO: nu verder onderzoeken voor volgende keer
+    # Scores berekenen voor verschillende keypoints in verschillende acties
+    # specifieke feedback via dict doen => kijken voor connectie tussen 2 verschillende keypoints
 
   """
       # TODO: oude versie => dit is indented, moet tab naar achter uit comments
