@@ -1,5 +1,2 @@
-import re
-
-lijst = []
-lijst = [0]*20
-print(lijst)
+for i in range(17):
+  print(i)

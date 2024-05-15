@@ -105,25 +105,3 @@ match option:
         # TODO
         print("QUIT")
         quit()
-
-
-""" # feedback via oefening
-if exercise == "upperhand_bicep_curl":
-    #output_keypoints = predict_movenet_for_video(video_path, "upperhand_bicep_curl")
-    output_keypoints = predict_movenet_for_webcam("upperhand_bicep_curl") """
-
-
-
-
-""" output_keypoints = [] # mm2.predict_movenet_for_video(video_path)
-
-if output_keypoints is not None:    
-    print("Converted to Gif Successfully")
-
-# om de 6 frames bijhouden
-framerate = 6
-output_keypoints_input = []
-for frame in range(0, len(output_keypoints), framerate):
-   output_keypoints_input.append(output_keypoints[frame])
-print(output_keypoints_input)
-"""

@@ -146,7 +146,6 @@ def predict_movenet_for_webcam(exercise, reps_count):
 
     output_keypoints = []
     current_state = 0
-    wrong_states = 0
     duration_states = 0 
     reps = 0
     
@@ -172,27 +171,8 @@ def predict_movenet_for_webcam(exercise, reps_count):
             # Compare frame
             # TODO: this
             if frame_count % 15 == 0:
-                similarity_score_current, similarity_score_next, reps = compare(keypoints_with_scores[0][0], current_state, exercise, reps)
-                # als score dichter ligt bij next dan is het de volgende state
-                if similarity_score_next > similarity_score_current and similarity_score_next > 2.5: # een grenswaarde zoeken
-                    current_state += 1
-                    wrong_states = 0
-                    duration_states = 0
-                    print("next state")
-                elif similarity_score_current < 2.5:
-                    print("foute score")
-                    wrong_states += 1
-                else: 
-                    #duration_states += 1
-                    print("ok")
-                if wrong_states > 10 and current_state != 0: # een waarde zoeken
-                    print("exit dit hele programma als fout")
-                if duration_states > 10 and current_state != 0:
-                    print("duurt te lang tussen 2 states (te traag)")
+                score_current, duration_states, reps = compare(keypoints_with_scores[0][0], current_state, duration_states, reps, exercise)
                 print("REPS: ", reps)
-            if reps == reps_count:
-                print("Oefening voltooid")
-                break
 
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
@@ -200,6 +180,9 @@ def predict_movenet_for_webcam(exercise, reps_count):
             frame_count += 1
             if cv2.waitKey(1) & 0xFF == ord('q'): 
               break
+            if reps == reps_count:
+                print("CONGRATULATIONS: EXERCISE PERFORMED SUCCESFULLY!!")
+                break
 
         if ret != True:
             break
