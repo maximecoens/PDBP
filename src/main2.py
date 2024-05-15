@@ -30,7 +30,8 @@ def choose_ex():
     print("Exercises: ")
     exercises = np.load(f'src\exercises\/exercises.npy')
     for i, ex in enumerate(exercises):
-        print(i + 1, f". {re.sub("_", " ", ex.capitalize())}")
+        ex = re.sub("_", " ", ex.capitalize())
+        print(i + 1, f". {ex}")
     exercise = int(input())
     if exercise > 0 and exercise < len(exercises):
         print("How many repetitions: ")
