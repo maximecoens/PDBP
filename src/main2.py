@@ -33,7 +33,7 @@ def choose_ex():
         ex = re.sub("_", " ", ex.capitalize())
         print(i + 1, f". {ex}")
     exercise = int(input())
-    if exercise > 0 and exercise < len(exercises):
+    if exercise > 0 and exercise <= len(exercises):
         print("How many repetitions: ")
         count_reps = int(input())
         # TODO: moet dit iets teruggeven?
@@ -81,7 +81,7 @@ def upload_new():
     print("Enter keypoint numbers with space in between: ")
     ex_keypoints = str(input())
     # TODO: hoe doorgeven aan compare? => via nmpy bijhouden, kan sws maar is dit best? => zo kan feedback wel
-    # TODO: kan dit voor specifieke feedback? => niet beginnen kutten in lijsten
+    # TODO: kan dit voor specifieke feedback? => niet beginnen cutten in lijsten
     if ex_keypoints == "0":
         ex_keypoints = [number for number in range(0,17)]
     else:

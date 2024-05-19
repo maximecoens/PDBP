@@ -32,7 +32,6 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
   # TODO: unicodeescape => codec cant decode bytes
   # TODO: time delta werken, tussen current state en next state ook meer dan 10 frames?
   # states = np.load('src\exercises//upperhand_bicep_curl.npy') # _delta ? zie general
-  score_current = 0
 
   # paths to correct exersice pictures
   correct_ex_keypoints = np.load('src/exercises//upperhand_bicep_curl.npy') 
@@ -40,31 +39,42 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
   images = [image for image in files]
   correct_ex_jpg = [os.path.join("src/screenshots//upperhand_bicep_curl", image) for image in images]
 
+  # Show first jpg
+  if current_state == 0:
+    image = cv2.imread(correct_ex_jpg[0])
+    image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
+    cv2.imshow("Correct exercise", image)
+
   # TODO: Testen voor tonen van verschillende foto's + werkt dit? => testen
   # TODO: checken voor specifieke feedback
   scores_current = [0] * 20
 
   for coord in range(5, 11):
-
     scores_current[coord] = np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
     np.seterr(divide='ignore')
     scores_current[coord] = np.arctanh(scores_current[coord])
+  print(f"scores_current: {scores_current[5:11]}")
+  print(f"current state: {current_state}")
 
   wrong_position = False
-  for i in range(5, 11):
-    if scores_current[i] <= 2.5:
-      wrong_position = True
-      print(feedback[current_state][i])
+  if current_state != 0:
+    wrong_position = False
+    for i in range(5, 11):
+      if scores_current[i] <= 3: # TODO: test
+        wrong_position = True
+        print(scores_current[5:11])
+        print(feedback[current_state][i])
   
-  if wrong_position and score_current != 0:
+  if wrong_position and current_state != 0:
     duration_states += 1
+
   #TODO: check hoelang hier tussen moet zitten, om de hoeveel seconden roept hij compare op en hoelang voor wrong state optellen
-  if duration_states >= 10:
-    print("UNSUCCESSFUL: The executing of this exercise was false or took too long!!")
-    quit()
+#  if duration_states >= 15:
+#    print("UNSUCCESSFUL: The executing of this exercise was false or took too long!!")
+#    quit()
 
-  if all(score > 2.5 for score in scores_current):
-
+  if all(score > 3 for score in scores_current[5:11]):
+    print(f"Good: {scores_current[5:11]}")
     # Show image of next state when the execution of the current state was correct
     image = cv2.imread(correct_ex_jpg[(current_state + 1) % len(correct_ex_jpg)])
     image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
@@ -79,7 +89,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
     reps += 1
     current_state = 0
 
-  return score_current, duration_states, reps
+  return current_state, duration_states, reps
 
 
 ## TODO: kijken of het werkt voor een general werking met 17 keypoints! => al zittend niet mogelijk

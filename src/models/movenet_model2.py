@@ -171,7 +171,7 @@ def predict_movenet_for_webcam(exercise, reps_count):
             # Compare frame
             # TODO: this
             if frame_count % 15 == 0:
-                score_current, duration_states, reps = compare(keypoints_with_scores[0][0], current_state, duration_states, reps, exercise)
+                current_state, duration_states, reps = compare(keypoints_with_scores[0][0], current_state, duration_states, reps, exercise)
                 print("REPS: ", reps)
 
             # Crops the image for model 
