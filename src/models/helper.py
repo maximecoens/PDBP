@@ -353,5 +353,5 @@ def draw_prediction_on_image(
 
 def to_gif(images, exercise, fps):
   """Converts image sequence (4D numpy array) to gif."""
-  imageio.mimsave(f"{exercise}.gif", images, fps=fps) # eerste was outputgifs
-  return embed.embed_file(f'./{exercise}.gif')
+  imageio.mimsave(f"outputgifs/{exercise}.gif", images, fps=fps) # eerste was outputgifs
+  return embed.embed_file(f'outputgifs/{exercise}.gif')

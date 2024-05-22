@@ -31,7 +31,7 @@ def choose_ex():
     exercises = np.load(f'src\exercises\/exercises.npy')
     for i, ex in enumerate(exercises):
         ex = re.sub("_", " ", ex.capitalize())
-        print(i + 1, f". {ex}")
+        print(f"{i + 1}. {ex}")
     exercise = int(input())
     if exercise > 0 and exercise <= len(exercises):
         print("How many repetitions: ")
@@ -49,6 +49,9 @@ def upload_new():
     name_ex = str(input())
     name_ex = re.sub(" ", "_", name_ex.lower())
     exercises = np.load('src\exercises\exercises.npy')
+    if name_ex in exercises:
+        print("Exercise already uploaded or name of exercise already in use! Run program again.")
+        quit()
     exercises = np.append(exercises, [name_ex])
     np.save(f'src\exercises\exercises.npy', exercises)
 

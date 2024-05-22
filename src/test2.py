@@ -97,7 +97,8 @@ def predict_movenet_for_video(video_path, exercise, delta):
     print("Frame count : ", frame_count)
 
     return output_keypoints
-  
+
 
   
-output = predict_movenet_for_video("src\/testdata\/bovenhandse_bicep_curl.mp4", 'testex', 4)
+output = predict_movenet_for_video("src\screenshots\/upperhand_bicep_curl\state4.jpg", 'testex', 4)
+print(output)

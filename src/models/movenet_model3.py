@@ -1,15 +1,22 @@
+from matplotlib.pylab import norm
 import tensorflow as tf
 import numpy as np
 import cv2
-from helper import _keypoints_and_edges_for_display, to_gif, draw_prediction_on_image, \
+from models.helper import _keypoints_and_edges_for_display, to_gif, draw_prediction_on_image, \
     init_crop_region, determine_crop_region, run_inference, crop_and_resize, determine_torso_and_body_range, \
     torso_visible
 import os
+from exercises.compares import compare
 
 
-def predict_movenet_for_video():
+current_state = 0
+wrong_states = 0
+duration_states = 0
+output_images = []
+
+def predict_movenet_for_video(video_path, exercise, delta):
     model_name = "movenet_lightning"
-    interpreter = tf.lite.Interpreter(model_path="models/lite-model_movenet_singlepose_lightning_3.tflite")
+    interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
     input_size = 192 
 
     interpreter.allocate_tensors()
@@ -33,23 +40,24 @@ def predict_movenet_for_video():
         interpreter.set_tensor(input_details[0]['index'], input_image.numpy())
         # Invoke inference.
         interpreter.invoke()
-        # Get the model prediction.
+        # Get the model prediction
         keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
 
         return keypoints_with_scores
 
     # Load the input video file.
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(video_path)
     # Initialize the frame count
     frame_count = 0
+    # Initialize frames per second
+    fps = 30
 
-    output_images = []
     output_keypoints = []
+    #current_state = 0
     
     while cap.isOpened():
         
         ret, frame = cap.read()
-        print(frame)
 
         if ret:
             image_height, image_width, _ = frame.shape
@@ -62,15 +70,22 @@ def predict_movenet_for_video():
             keypoints_with_scores = run_inference(
                 movenet, frame, crop_region,
                 crop_size=[input_size, input_size])
+            output_keypoints.append(keypoints_with_scores[0][0])
+            
+            # Check if it's time to capture a screenshot
+            if frame_count % (fps * delta) == 0:
+                # Save the screenshot
+                screenshot_path = os.path.join(f'src/screenshots/{exercise}/screenshot_{frame_count}.jpg')
+                cv2.imwrite(screenshot_path, frame)
+                print(f'Saved screenshot: {screenshot_path}')
+                
 
-            output_keypoints.append(keypoints_with_scores)
-
-            # draw prediction on camera see textwebcam
-            draw_prediction_on_image(
+            # For GIF Visualization
+            output_images.append(draw_prediction_on_image(
                 frame.astype(np.int32),
                 keypoints_with_scores, crop_region=None,
-                close_figure=True, output_image_height=300)
-
+                close_figure=True, output_image_height=300))
+            
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
 
@@ -86,19 +101,13 @@ def predict_movenet_for_video():
     # Closes all the frames
     cv2.destroyAllWindows()
     
-    # will be stored as animation.gif
-    to_gif(output, fps=10)
+    # will be stored as a gif
+    to_gif(output, exercise, fps=10)
     
     print("Frame count : ", frame_count)
 
     return output_keypoints
 
-
-if __name__ == "__main__":
-
-    output_keypoints = predict_movenet_for_video()
-    print(output_keypoints)
-
-    if output_keypoints is not None:    
-        print("Converted to Gif Successfully")
   
+
+output = predict_movenet_for_video("src\/testdata\/bovenhandse_bicep_curl.mp4", "test", 0.5)

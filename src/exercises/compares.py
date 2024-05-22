@@ -1,3 +1,4 @@
+import time
 import tensorflow as tf
 import numpy as np
 from matplotlib import pyplot as plt
@@ -6,16 +7,16 @@ import cv2
 import os
 
 
-def compare(inputFrame, current_state, duration_states, reps, exercise):
+def compare(inputFrame, current_state, duration_states, reps, count_reps, exercise):
   # kijken welke oefening met switch
   if exercise == 'upperhand_bicep_curl':
-    return compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps)
+    return compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps, count_reps)
   else:
-    return compare_general(inputFrame, current_state, duration_states, reps, exercise)
+    return compare_general(inputFrame, current_state, duration_states, reps, count_reps, exercise)
   
 keypoints_input = []
 
-def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
+def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps, count_reps):
 
   """ return code 0 is True (juiste beweging)
       return code 1 is False (laatste state)
@@ -34,33 +35,48 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
   # states = np.load('src\exercises//upperhand_bicep_curl.npy') # _delta ? zie general
 
   # paths to correct exersice pictures
-  correct_ex_keypoints = np.load('src/exercises//upperhand_bicep_curl.npy') 
+  correct_ex_keypoints = np.load('src/exercises//upperhand_bicep_curl_delta.npy') 
   files = os.listdir(f'src/screenshots//upperhand_bicep_curl')
   images = [image for image in files]
   correct_ex_jpg = [os.path.join("src/screenshots//upperhand_bicep_curl", image) for image in images]
 
   # Show first jpg
   if current_state == 0:
-    image = cv2.imread(correct_ex_jpg[0])
+    image = cv2.imread(correct_ex_jpg[current_state])
     image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
     cv2.imshow("Correct exercise", image)
 
   # TODO: Testen voor tonen van verschillende foto's + werkt dit? => testen
   # TODO: checken voor specifieke feedback
   scores_current = [0] * 20
+  scores_prev = [0] * 20
 
   for coord in range(5, 11):
+
+    # Determine score of previous state
+    scores_prev[coord] = np.dot(inputFrame[coord][:2], correct_ex_keypoints[len(correct_ex_jpg) - 1 if current_state == 0 else current_state - 1][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[len(correct_ex_jpg) - 1 if current_state == 0 else current_state - 1][coord][:2]))
+    np.seterr(divide='ignore')
+    scores_prev[coord] = np.arctanh(scores_prev[coord])
+
+    # Determine score of current state
     scores_current[coord] = np.dot(inputFrame[coord][:2], correct_ex_keypoints[current_state][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[current_state][coord][:2]))
     np.seterr(divide='ignore')
     scores_current[coord] = np.arctanh(scores_current[coord])
+
+    """
+    scores_next[coord] = np.dot(inputFrame[coord][:2], correct_ex_keypoints[(current_state + 1) % len(correct_ex_jpg)][coord][:2]) / (norm(inputFrame[coord][:2])*norm(correct_ex_keypoints[(current_state + 1) % len(correct_ex_jpg)][coord][:2]))
+    np.seterr(divide='ignore')
+    scores_next[coord] = np.arctanh(scores_next[coord])
+    """
+
+  print(f"scores prev: {scores_prev[5:11]}")
   print(f"scores_current: {scores_current[5:11]}")
-  print(f"current state: {current_state}")
 
   wrong_position = False
   if current_state != 0:
     wrong_position = False
     for i in range(5, 11):
-      if scores_current[i] <= 3: # TODO: test
+      if scores_current[i] <= 2.7: # TODO: test
         wrong_position = True
         print(scores_current[5:11])
         print(feedback[current_state][i])
@@ -73,8 +89,15 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
 #    print("UNSUCCESSFUL: The executing of this exercise was false or took too long!!")
 #    quit()
 
-  if all(score > 3 for score in scores_current[5:11]):
-    print(f"Good: {scores_current[5:11]}")
+  bt_high = len([num for num in scores_current[5:11] if num > 3.1])
+  bt_mid = len([num for num in scores_current[5:11] if num > 2.9])
+  bt_min = len([num for num in scores_current[5:11] if num > 2.4])
+  print(f"current state: {current_state}")
+  print(f"Curren > previous !!!!{np.average(scores_current)} en {np.average(scores_prev)}")
+  if current_state == 0 and (bt_high >= 1 and bt_mid >= 2 and bt_min >= 3) \
+    or (bt_high >= 3 and bt_mid >= 4 and bt_min >= 6) \
+    or (np.average(scores_current) >= np.average(scores_prev) and ((bt_high >= 2 and bt_mid >= 3 and bt_min >= 6))): # each number bigger than 2.5 and 4 out of 6 bigger than 3.7
+  #if np.average(scores_current) < np.average(scores_next):
     # Show image of next state when the execution of the current state was correct
     image = cv2.imread(correct_ex_jpg[(current_state + 1) % len(correct_ex_jpg)])
     image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
@@ -82,12 +105,20 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
     # cv2.waitKey(0)
 
     duration_states = 0
-    current_state += 1
+    current_state += 1 # TODO: checken voor zelfde staat => eerste
+
     print("GREAT: This movement was executed perfectly!!")
-  
-  if current_state == len(correct_ex_jpg) - 1:
+    if current_state == len(correct_ex_jpg) - 1 and reps + 1 == count_reps:
+      time.sleep(1)
+      image = cv2.imread(correct_ex_jpg[0])
+      image = cv2.resize(image, (318, 691), interpolation=cv2.INTER_LINEAR)
+      cv2.imshow("Correct exercise", image)
+
+
+  if current_state == len(correct_ex_jpg):
     reps += 1
     current_state = 0
+
 
   return current_state, duration_states, reps
 
@@ -96,7 +127,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps):
 ## mogelijks keypoints weergeven?
 ## TODO: reps
 
-def compare_general(inputFrame, current_state, duration_states, reps, exercise):
+def compare_general(inputFrame, current_state, duration_states, reps, count_reps, exercise):
 
   # Feedback for each wrong body position via keypoint detection
   feedback = "ATTENTION: The movement was not executed correctly. Check the image!!"

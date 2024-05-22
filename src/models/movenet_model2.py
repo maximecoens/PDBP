@@ -139,7 +139,7 @@ def predict_movenet_for_webcam(exercise, reps_count):
 
         return keypoints_with_scores
 
-    # Load the input video file.
+    # Open webcam.
     cap = cv2.VideoCapture(0)
     # Initialize the frame count
     frame_count = 0
@@ -155,7 +155,6 @@ def predict_movenet_for_webcam(exercise, reps_count):
 
         if ret:
             cv2.imshow('frame', frame)
-            # creating 'q' as the quit button for the video 
             image_height, image_width, _ = frame.shape
 
             # Initialize only during the first frame
@@ -170,14 +169,15 @@ def predict_movenet_for_webcam(exercise, reps_count):
 
             # Compare frame
             # TODO: this
-            if frame_count % 15 == 0:
-                current_state, duration_states, reps = compare(keypoints_with_scores[0][0], current_state, duration_states, reps, exercise)
+            if frame_count % 30 == 0: # TODO: was 15 maar nu om de seconde (30)
+                current_state, duration_states, reps = compare(keypoints_with_scores[0][0], current_state, duration_states, reps, reps_count, exercise)
                 print("REPS: ", reps)
 
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
 
             frame_count += 1
+            # creating 'q' as the quit button for the video 
             if cv2.waitKey(1) & 0xFF == ord('q'): 
               break
             if reps == reps_count:
