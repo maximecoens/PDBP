@@ -2,11 +2,10 @@ from matplotlib.pylab import norm
 import tensorflow as tf
 import numpy as np
 import cv2
-from models.helper import _keypoints_and_edges_for_display, to_gif, draw_prediction_on_image, \
+from helper import _keypoints_and_edges_for_display, to_gif, draw_prediction_on_image, \
     init_crop_region, determine_crop_region, run_inference, crop_and_resize, determine_torso_and_body_range, \
     torso_visible
 import os
-from exercises.compares import compare
 
 
 current_state = 0
@@ -16,8 +15,8 @@ output_images = []
 
 def predict_movenet_for_video(video_path, exercise, delta):
     model_name = "movenet_lightning"
-    interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
-    input_size = 192 
+    interpreter = tf.lite.Interpreter(model_path="src\models\movenet_thunder_f16.tflite")
+    input_size = 256
 
     interpreter.allocate_tensors()
 
@@ -34,7 +33,7 @@ def predict_movenet_for_video(video_path, exercise, delta):
         coordinates and scores.
         """
         # TF Lite format expects tensor type of uint8.
-        input_image = tf.cast(input_image, dtype=tf.float32)
+        input_image = tf.cast(input_image, dtype=tf.uint8)
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
         interpreter.set_tensor(input_details[0]['index'], input_image.numpy())
@@ -102,7 +101,7 @@ def predict_movenet_for_video(video_path, exercise, delta):
     cv2.destroyAllWindows()
     
     # will be stored as a gif
-    to_gif(output, exercise, fps=10)
+    to_gif(output, exercise, fps=30)
     
     print("Frame count : ", frame_count)
 
@@ -110,4 +109,4 @@ def predict_movenet_for_video(video_path, exercise, delta):
 
   
 
-output = predict_movenet_for_video("src\/testdata\/bovenhandse_bicep_curl.mp4", "test", 0.5)
+output = predict_movenet_for_video("src\/testdata\/bovenhandse_bicep_curl.mp4", "test", 1)

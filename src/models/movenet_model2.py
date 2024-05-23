@@ -14,10 +14,11 @@ wrong_states = 0
 duration_states = 0
 output_images = []
 
-def predict_movenet_for_video(video_path, exercise, delta):
-    model_name = "movenet_lightning"
-    interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
-    input_size = 192 
+# TODO: invoeren van verschillende versies: input_size ook aanpassen: vragen aan chatgpt voor meer info en welke
+
+def predict_movenet_for_video(video_path, exercise, delta, model):
+    
+    model_name, interpreter, input_size = initialize_model(model)
 
     interpreter.allocate_tensors()
 
@@ -102,16 +103,15 @@ def predict_movenet_for_video(video_path, exercise, delta):
     cv2.destroyAllWindows()
     
     # will be stored as a gif
-    to_gif(output, exercise, fps=10)
+    to_gif(output, exercise, fps=30)
     
     print("Frame count : ", frame_count)
 
     return output_keypoints
 
-def predict_movenet_for_webcam(exercise, reps_count):
-    model_name = "movenet_lightning"
-    interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
-    input_size = 192 
+def predict_movenet_for_webcam(exercise, reps_count, model):
+
+    model_name, interpreter, input_size = initialize_model(model)
 
     interpreter.allocate_tensors()
 
@@ -128,6 +128,7 @@ def predict_movenet_for_webcam(exercise, reps_count):
         coordinates and scores.
         """
         # TF Lite format expects tensor type of uint8.
+        # TODO: is niet altijd float32 !testen met video + aanpassen in latex
         input_image = tf.cast(input_image, dtype=tf.float32)
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
@@ -192,8 +193,30 @@ def predict_movenet_for_webcam(exercise, reps_count):
     cv2.destroyAllWindows()
     
     print("Frame count : ", frame_count)
-
-    return output_keypoints
   
 
+def initialize_model(model):
+    model_name = "movenet_lightning_f16"
+    match model:
+        case 1:
+            model_name = "movenet_lightning_f16"
+            interpreter = tf.lite.Interpreter(model_path="src\models\movenet_lightning_f16.tflite")
+            input_size = 192 
+        case 2:
+            model_name = "movenet_thunder_f16"
+            interpreter = tf.lite.Interpreter(model_path="src\models\movenet_thunder_f16.tflite")
+            input_size = 256
+        case 3:
+            model_name = "movenet_lightning_int8"
+            interpreter = tf.lite.Interpreter(model_path="src\models\movenet_lightning_int8.tflite")
+            input_size = 192 
+        case 4:
+            model_name = "movenet_thunder_int8"
+            interpreter = tf.lite.Interpreter(model_path="src\models\movenet_thunder_int8.tflite")
+            input_size = 256
+        case 5:
+            model_name = "lite-model_movenet_singlepose_lightning_3"
+            interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
+            input_size = 192 
+    return model_name, interpreter, input_size
   

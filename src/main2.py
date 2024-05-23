@@ -26,6 +26,8 @@ print("1. Choose Exercise")
 print("2. Upload new Exercise")
 print("3. Quit")
 
+# TODO: fout afhandeling op andere manier en voor models toevoegen.
+# TODO: meer info over models?
 def choose_ex():
     print("Exercises: ")
     exercises = np.load(f'src\exercises\/exercises.npy')
@@ -34,10 +36,19 @@ def choose_ex():
         print(f"{i + 1}. {ex}")
     exercise = int(input())
     if exercise > 0 and exercise <= len(exercises):
+
         print("How many repetitions: ")
         count_reps = int(input())
-        # TODO: moet dit iets teruggeven?
-        output_keypoints = predict_movenet_for_webcam(exercises[exercise - 1], count_reps)
+
+        print("Which Movenet model do you want to use?")
+        print("1. movenet_lightning_f16")
+        print("2. movenet_thunder_f16")
+        print("3. movenet_lightning_int8")
+        print("4. movenet_thunder_int8")
+        print("5. lite-model_movenet_singlepose_lightning_3")
+        model = int(input())
+
+        predict_movenet_for_webcam(exercises[exercise - 1], count_reps, model)
     else:
         print("INVALID OPTION")
         choose_ex()
@@ -57,6 +68,14 @@ def upload_new():
 
     print("Path to video:")
     video_path = str(input())
+
+    print("Which Movenet model do you want to use?")
+    print("1. movenet_lightning_f16")
+    print("2. movenet_thunder_f16")
+    print("3. movenet_lightning_int8")
+    print("4. movenet_thunder_int8")
+    print("5. lite-model_movenet_singlepose_lightning_3")
+    model = int(input())
 
     print("How many seconds between 2 correct body positions: ")
     delta = float(input())
@@ -92,7 +111,7 @@ def upload_new():
 
 
     # Gather and save keypoints
-    output_keypoints = predict_movenet_for_video(video_path, name_ex, delta)
+    output_keypoints = predict_movenet_for_video(video_path, name_ex, delta, model)
     np.save(f'src\exercises\{name_ex}.npy', output_keypoints)
     np.save(f'src\exercises\{name_ex}_delta.npy', output_keypoints[::delta])
     print(f"The new exercise {name_ex} was successfully uploaded!")
@@ -106,6 +125,5 @@ match option:
     case 2:
         upload_new()
     case 3:
-        # TODO
         print("QUIT")
         quit()
