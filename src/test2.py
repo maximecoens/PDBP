@@ -68,18 +68,29 @@ def predict_movenet_for_video(video_path, exercise, delta):
             keypoints_with_scores = run_inference(
                 movenet, frame, crop_region,
                 crop_size=[input_size, input_size])
-            output_keypoints.append(keypoints_with_scores[0][0])               
+            output_keypoints.append(keypoints_with_scores[0][0])   
 
+            # Check if it's time to capture a screenshot
+            # TODO: om de zoveel frames
+            if frame_count == 2:
+                # Save the screenshot
+                if not os.path.isdir(f'src/screenshots/\{exercise}'):
+                    os.mkdir(f'src/screenshots/\{exercise}')
+                screenshot_path = os.path.join(f'src/screenshots/\{exercise}/screenshot_{frame_count}.jpg')
+                cv2.imwrite(screenshot_path, frame)
+                print(f'Saved screenshot: {screenshot_path}')       
+
+            """
             # For GIF Visualization
             output_images.append(draw_prediction_on_image(
                 frame.astype(np.int32),
                 keypoints_with_scores, crop_region=None,
-                close_figure=True, output_image_height=300))
+                close_figure=True, output_image_height=300)) """
             
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
 
-            output = np.stack(output_images, axis=0)
+            #output = np.stack(output_images, axis=0)
 
             frame_count += 1
 
@@ -92,7 +103,7 @@ def predict_movenet_for_video(video_path, exercise, delta):
     cv2.destroyAllWindows()
     
     # will be stored as a gif
-    to_gif(output, exercise, fps=10)
+    #to_gif(output, exercise, fps=10)
     
     print("Frame count : ", frame_count)
 
@@ -100,5 +111,5 @@ def predict_movenet_for_video(video_path, exercise, delta):
 
 
   
-output = predict_movenet_for_video("src\screenshots\/upperhand_bicep_curl\state4.jpg", 'testex', 4)
+output = predict_movenet_for_video("src\/testdata\/bovenhandse_bicep_curl.mp4", 'testex', 5)
 print(output)

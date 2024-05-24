@@ -1,20 +1,19 @@
 from matplotlib.pylab import norm
-import tensorflow as tf
 import numpy as np
 import cv2
 from models.helper import _keypoints_and_edges_for_display, to_gif, draw_prediction_on_image, \
     init_crop_region, determine_crop_region, run_inference, crop_and_resize, determine_torso_and_body_range, \
     torso_visible
-import os
 from exercises.compares import compare
+import os
+import tensorflow as tf
 
 
 current_state = 0
 wrong_states = 0
 duration_states = 0
 output_images = []
-
-# TODO: invoeren van verschillende versies: input_size ook aanpassen: vragen aan chatgpt voor meer info en welke
+tensor_type = tf.float16
 
 def predict_movenet_for_video(video_path, exercise, delta, model):
     
@@ -76,11 +75,12 @@ def predict_movenet_for_video(video_path, exercise, delta, model):
             # Check if it's time to capture a screenshot
             if frame_count % (fps * delta) == 0:
                 # Save the screenshot
-                screenshot_path = os.path.join(f'src/screenshots/{exercise}/screenshot_{frame_count}.jpg')
+                if not os.path.isdir(f'src/screenshots/\{exercise}'):
+                    os.mkdir(f'src/screenshots/\{exercise}')
+                screenshot_path = os.path.join(f'src/screenshots/\{exercise}/screenshot_{frame_count}.jpg')
                 cv2.imwrite(screenshot_path, frame)
-                print(f'Saved screenshot: {screenshot_path}')
+                print(f'Saved screenshot: {screenshot_path}') 
                 
-
             # For GIF Visualization
             output_images.append(draw_prediction_on_image(
                 frame.astype(np.int32),
@@ -111,7 +111,7 @@ def predict_movenet_for_video(video_path, exercise, delta, model):
 
 def predict_movenet_for_webcam(exercise, reps_count, model):
 
-    model_name, interpreter, input_size = initialize_model(model)
+    model_name, interpreter, input_size, tensor_type = initialize_model(model)
 
     interpreter.allocate_tensors()
 
@@ -127,9 +127,7 @@ def predict_movenet_for_webcam(exercise, reps_count, model):
         A [1, 1, 17, 3] float numpy array representing the predicted keypoint
         coordinates and scores.
         """
-        # TF Lite format expects tensor type of uint8.
-        # TODO: is niet altijd float32 !testen met video + aanpassen in latex
-        input_image = tf.cast(input_image, dtype=tf.float32)
+        input_image = tf.cast(input_image, dtype=tensor_type)
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
         interpreter.set_tensor(input_details[0]['index'], input_image.numpy())
@@ -168,9 +166,8 @@ def predict_movenet_for_webcam(exercise, reps_count, model):
                 crop_size=[input_size, input_size])
             output_keypoints.append(keypoints_with_scores[0][0])
 
-            # Compare frame
-            # TODO: this
-            if frame_count % 30 == 0: # TODO: was 15 maar nu om de seconde (30)
+            # Compare frame every second (30fps)
+            if frame_count % 30 == 0:
                 current_state, duration_states, reps = compare(keypoints_with_scores[0][0], current_state, duration_states, reps, reps_count, exercise)
                 print("REPS: ", reps)
 
@@ -202,21 +199,26 @@ def initialize_model(model):
             model_name = "movenet_lightning_f16"
             interpreter = tf.lite.Interpreter(model_path="src\models\movenet_lightning_f16.tflite")
             input_size = 192 
+            tensor_type = tf.uint8
         case 2:
             model_name = "movenet_thunder_f16"
             interpreter = tf.lite.Interpreter(model_path="src\models\movenet_thunder_f16.tflite")
             input_size = 256
+            tensor_type = tf.uint8
         case 3:
             model_name = "movenet_lightning_int8"
             interpreter = tf.lite.Interpreter(model_path="src\models\movenet_lightning_int8.tflite")
             input_size = 192 
+            tensor_type = tf.uint8
         case 4:
             model_name = "movenet_thunder_int8"
             interpreter = tf.lite.Interpreter(model_path="src\models\movenet_thunder_int8.tflite")
             input_size = 256
+            tensor_type = tf.uint8
         case 5:
             model_name = "lite-model_movenet_singlepose_lightning_3"
             interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
             input_size = 192 
-    return model_name, interpreter, input_size
+            tensor_type = tf.float32
+    return model_name, interpreter, input_size, tensor_type
   

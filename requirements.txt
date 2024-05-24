@@ -1,0 +1,6 @@
+tensorflow
+numpy
+opencv-python
+imageio
+git+https://github.com/tensorflow/docs
+scikit-learn
