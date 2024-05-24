@@ -1,10 +1,7 @@
-Optimalisatie van lichaamsbewegingen
-door integratie van pose detection mo-
-dellen in kinesiologische praktijken.
-Een onderzoek naar de potentiële efficiëntievergroting
-voor kinesisten.
+# Optimalisatie van lichaamsbewegingen door integratie van pose detection modellen in kinesiologische praktijken.
+## Een onderzoek naar de potentiële efficiëntievergroting voor kinesisten.
 
-**Bachelorproef Maxime Coens 2023-2024 HoGent**
+**Bachelorproef Maxime Coens - 2024 - HoGent**
 
 
 In het kader van deze bachelorproef Toegepaste Informatica aan de Hogeschool
