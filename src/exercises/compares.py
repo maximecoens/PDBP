@@ -28,8 +28,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps, co
               2: ["", "", "", "", "", "", "", "ATTENTION (left arm): Make sure your arms are in a 90 degrees position!", "ATTENTION (right arm): Make sure your arms are in a 90 degrees position!", "ATTENTION (left arm): Make sure your arms are in a 90 degrees position!", "ATTENTION (right arm): Make sure your arms are in a 90 degrees position!", "", "", "", "", "", "", ""],
               3: ["", "", "", "", "", "", "", "ATTENTION (left arm): Make sure your arms are in a 45 degrees position!", "ATTENTION (right arm): Make sure your arms are in a 45 degrees position!", "ATTENTION (left arm): Make sure your arms are in a 45 degrees position!", "ATTENTION (right arm): Make sure your arms are in a 45 degrees position!", "", "", "", "", "", "", ""],
               4: ["", "", "", "", "", "", "", "ATTENTION (left arm): Make sure your arms are in a 180 degrees position!", "ATTENTION (right arm): Make sure your arms are in a 180 degrees position!", "ATTENTION (left arm): Make sure your arms are in a 180 degrees position!", "ATTENTION (right arm): Make sure your arms are in a 180 degrees position!", "", "", "", "", "", "", ""]}
-  
-  # TODO: unicodeescape => codec cant decode bytes
+
 
   # paths to correct exersice pictures
   correct_ex_keypoints = np.load('src/exercises//upperhand_bicep_curl_delta.npy') 
@@ -65,6 +64,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps, co
     for i in range(5, 11):
       if scores_current[i] <= 1.6:
         wrong_position = True
+        print(feedback[current_state][i])
   
   if wrong_position and current_state != 0:
     duration_states += 1
@@ -108,8 +108,6 @@ def compare_general(inputFrame, current_state, duration_states, reps, count_reps
   # Feedback for each wrong body position via keypoint detection
   feedback = "ATTENTION: The movement was not executed correctly. Check the image!!"
   
-  # states hier bewaren: uit een test code halen in numpy array steken.
-  # TODO: unicodeescape => codec cant decode bytes
   score_current = 0
 
   # paths to correct exersice pictures
