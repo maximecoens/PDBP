@@ -112,7 +112,7 @@ def upload_new():
 
 
     # Gather and save keypoints
-    output_keypoints = predict_movenet_for_video(video_path, name_ex, delta, model, ex_keypoints)
+    output_keypoints = predict_movenet_for_video(video_path, name_ex, delta, model)
     np.save(f'src\\exercises\\{name_ex}.npy', output_keypoints)
     np.save(f'src\\exercises\\{name_ex}_delta.npy', output_keypoints[::delta])
     print(f"The new exercise {name_ex} was successfully uploaded!")

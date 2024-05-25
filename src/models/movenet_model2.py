@@ -220,5 +220,5 @@ def initialize_model(model):
             interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
             input_size = 192 
             tensor_type = tf.float32
-    return model_name, interpreter, input_size, tensor_type
+    return model_name, interpreter, input_size#, tensor_type
   
