@@ -17,7 +17,7 @@ tensor_type = tf.float16
 
 def predict_movenet_for_video(video_path, exercise, delta, model):
     
-    model_name, interpreter, input_size = initialize_model(model)
+    model_name, interpreter, input_size, tensor_type = initialize_model(model)
 
     interpreter.allocate_tensors()
 
@@ -34,7 +34,7 @@ def predict_movenet_for_video(video_path, exercise, delta, model):
         coordinates and scores.
         """
         # TF Lite format expects tensor type of uint8.
-        input_image = tf.cast(input_image, dtype=tf.float32)
+        input_image = tf.cast(input_image, dtype=tensor_type)
         input_details = interpreter.get_input_details()
         output_details = interpreter.get_output_details()
         interpreter.set_tensor(input_details[0]['index'], input_image.numpy())
@@ -220,5 +220,5 @@ def initialize_model(model):
             interpreter = tf.lite.Interpreter(model_path="src\models\lite-model_movenet_singlepose_lightning_3.tflite")
             input_size = 192 
             tensor_type = tf.float32
-    return model_name, interpreter, input_size#, tensor_type
+    return model_name, interpreter, input_size, tensor_type
   

@@ -43,14 +43,17 @@ def choose_ex():
         count_reps = int(input())
     
     model = 0
-    while (model > 5 or model < 1):
+    while (model > 6 or model < 1):
         print("Which Movenet model do you want to use?")
         print("1. movenet_lightning_f16")
         print("2. movenet_thunder_f16")
         print("3. movenet_lightning_int8")
         print("4. movenet_thunder_int8")
         print("5. lite-model_movenet_singlepose_lightning_3")
+        print("6. Model info")
         model = int(input())
+        if model == 6:
+            show_info()
 
     predict_movenet_for_webcam(exercises[exercise - 1], count_reps, model)
 
@@ -70,13 +73,19 @@ def upload_new():
     print("Path to video:")
     video_path = str(input())
 
-    print("Which Movenet model do you want to use?")
-    print("1. movenet_lightning_f16")
-    print("2. movenet_thunder_f16")
-    print("3. movenet_lightning_int8")
-    print("4. movenet_thunder_int8")
-    print("5. lite-model_movenet_singlepose_lightning_3")
-    model = int(input())
+    model = 0
+    while (model > 6 or model < 1):
+        print("Which Movenet model do you want to use?")
+        print("1. movenet_lightning_f16")
+        print("2. movenet_thunder_f16")
+        print("3. movenet_lightning_int8")
+        print("4. movenet_thunder_int8")
+        print("5. lite-model_movenet_singlepose_lightning_3")
+        print("6. Model info")
+        model = int(input())
+        if model == 6:
+            show_info()
+
 
     print("How many seconds between 2 correct body positions: ")
     delta = float(input())
@@ -128,3 +137,38 @@ match option:
     case 3:
         print("QUIT")
         quit()
+
+
+def show_info():
+    print("                                                                       ")
+    print("************************ Movenet Lightning f16 ************************")
+    print("Deze versie is geschikt voor toepassingen met beperkte rekenkracht,")
+    print("zoals mobiele apparaten. Hier ligt de nadruk op snelheid in plaats")
+    print("van precisie, waardoor dit model geschikt is voor het detecteren van")
+    print("eenvoudige bewegingen.")
+    print("***********************************************************************")
+    print("                                                                       ")
+    print("************************* Movenet Thunder f16 *************************")
+    print("In tegenstelling tot het Lightning-model kan deze versie hogere")
+    print("rekenkracht aan en richt het zich op precisie. Dit model is geschikt")
+    print("voor gedetailleerde analyses van complexe bewegingen, zoals")
+    print("dansbewegingen.")
+    print("***********************************************************************")
+    print("                                                                       ")
+    print("*********************** Movenet Lightning int8 ************************")
+    print("Deze versie is ontworpen voor uiterst snelle toepassingen met zeer")
+    print("beperkte rekenkracht.")
+    print("***********************************************************************")
+    print("                                                                       ")
+    print("*********************** Movenet Thunder int8 **************************")
+    print("Dit model biedt een balans tussen nauwkeurigheid en snelheid, met")
+    print("minder rekenkracht dan de Float16-versies.")
+    print("***********************************************************************")
+    print("                                                                       ")
+    print("************** Lite-model Movenet singlepose Lightning 3 **************")
+    print("Dit model maakt gebruik van volledige floatprecisie, wat resulteert in")
+    print("hogere nauwkeurigheid dan de half-precisie modellen (Float16). Dit")
+    print("model is geschikt voor toepassingen waar rekenkracht geen beperking ")
+    print("vormt, zoals wetenschappelijk onderzoek.")
+    print("***********************************************************************")
+    print("                                                                       ")
