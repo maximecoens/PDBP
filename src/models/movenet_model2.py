@@ -73,7 +73,7 @@ def predict_movenet_for_video(video_path, exercise, delta, model):
             output_keypoints.append(keypoints_with_scores[0][0])
             
             # Check if it's time to capture a screenshot
-            if frame_count % (fps * delta) == 0:
+            if frame_count % round(fps * delta) == 0:
                 # Save the screenshot
                 if not os.path.isdir(f'src/screenshots/\{exercise}'):
                     os.mkdir(f'src/screenshots/\{exercise}')
@@ -170,6 +170,7 @@ def predict_movenet_for_webcam(exercise, reps_count, model):
             if frame_count % 30 == 0:
                 current_state, duration_states, reps = compare(keypoints_with_scores[0][0], current_state, duration_states, reps, reps_count, exercise)
                 print("REPS: ", reps)
+                print("STATE: ", current_state)
 
             # Crops the image for model 
             crop_region = determine_crop_region(keypoints_with_scores, image_height, image_width)
