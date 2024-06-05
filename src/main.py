@@ -101,11 +101,10 @@ def upload_new():
     if name_ex in exercises:
         print("Exercise already uploaded or name of exercise already in use! Run program again.")
         quit()
-    exercises = np.append(exercises, [name_ex])
-    np.save(f'src\\exercises\\exercises.npy', exercises)
 
     print("Path to video:")
     video_path = str(input())
+    video_path = re.sub("/", "\/", video_path)
 
     model = 0
     while (model > 6 or model < 1):
@@ -123,7 +122,7 @@ def upload_new():
 
     print("How many seconds between 2 correct body positions: ")
     delta = float(input())
-    delta = round(delta * 30)
+    delta = round(delta)
 
     print("Which keypoints are needed to focus on while detecting the body position?")
     print("0. All keypoints!")
@@ -153,6 +152,8 @@ def upload_new():
         ex_keypoints = [int(number) - 1 for number in ex_keypoints.split(" ")]
     np.save(f'src\\exercises\\{name_ex}_keypoints_focus.npy', ex_keypoints)
 
+    exercises = np.append(exercises, [name_ex])
+    np.save(f'src\\exercises\\exercises.npy', exercises)
 
     # Gather and save keypoints
     output_keypoints = predict_movenet_for_video(video_path, name_ex, delta, model)

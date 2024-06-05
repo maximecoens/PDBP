@@ -112,3 +112,10 @@ print(np.load("src\\exercises\\mctest_delta.npy")) """
 
 
 print(0.785 - 0.874)
+
+import numpy as np
+
+lijst = np.load("src\exercises\exercises.npy")
+lijst = np.save("src\exercises\exercises.npy", ["upperhand_bicep_curl"])
+lijst = np.load("src\exercises\exercises.npy")
+print(lijst)

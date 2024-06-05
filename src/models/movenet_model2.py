@@ -53,7 +53,6 @@ def predict_movenet_for_video(video_path, exercise, delta, model):
     fps = 30
 
     output_keypoints = []
-    #current_state = 0
     
     while cap.isOpened():
         
@@ -73,6 +72,7 @@ def predict_movenet_for_video(video_path, exercise, delta, model):
             output_keypoints.append(keypoints_with_scores[0][0])
             
             # Check if it's time to capture a screenshot
+            print(frame_count % round(fps * delta))
             if frame_count % round(fps * delta) == 0:
                 # Save the screenshot
                 if not os.path.isdir(f'src/screenshots/\{exercise}'):
@@ -103,7 +103,8 @@ def predict_movenet_for_video(video_path, exercise, delta, model):
     cv2.destroyAllWindows()
     
     # will be stored as a gif
-    to_gif(output, exercise, fps=30)
+    #output = np.stack(output_images, axis=0)
+    to_gif(output, exercise, fps)
     
     print("Frame count : ", frame_count)
 
