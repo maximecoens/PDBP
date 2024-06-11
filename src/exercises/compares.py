@@ -50,7 +50,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps, co
 
   # Check that all keypoints are detected
   coords = np.load(f'src\\exercises\\upperhand_bicep_curl_keypoints_focus.npy')
-  print(inputFrame[5:11])
+  #print(inputFrame[5:11])
   for coord in coords:
     if inputFrame[coord][2] < 0.5:
       print("Not all keypoints are detected.")
@@ -70,7 +70,7 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps, co
     np.seterr(divide='ignore')
     scores_next[coord] = np.arctanh(scores_next[coord])
 
-  print(scores_current[5:11])
+  #print(scores_current[5:11])
   # Give specific feedback based on scores
   wrong_position = False
   for i in coords:
@@ -83,13 +83,13 @@ def compare_bovenhandsecurl(inputFrame, current_state, duration_states, reps, co
     print("ATTENTION: Movement was not executed right!")
     wrong_position = True
 
-  print(np.average(scores_current[5:11]))
-  print(np.average(scores_next[5:11]))
+  #print(np.average(scores_current[5:11]))
+  #print(np.average(scores_next[5:11]))
   if wrong_position and current_state != 0:
     duration_states += 1
 
-  # If there is more than 10 seconds between 2 states, the exercise fails.
-  if duration_states >= 10:
+  # If there is more than 5 seconds between 2 states, the exercise fails.
+  if duration_states >= 5:
     print("UNSUCCESSFUL: The executing of this exercise was false or took too long!!")
     quit()
 
@@ -148,7 +148,7 @@ def compare_general(inputFrame, current_state, duration_states, reps, count_reps
     cv2.imshow("Movenet model", image)
 
   # Check that all keypoints are detected
-  coords = np.load(f'src\\exercises\\{exercise}_focus.npy')
+  coords = np.load(f'src\\exercises\\{exercise}_keypoints_focus.npy')
   for coord in coords:
     if inputFrame[coord][2] < 0.5:
       print("Not all keypoints are detected.")
@@ -184,8 +184,8 @@ def compare_general(inputFrame, current_state, duration_states, reps, count_reps
   if wrong_position and current_state != 0:
     duration_states += 1
 
-  # If there is more than 10 seconds between 2 states, the exercise fails.
-  if duration_states >= 10:
+  # If there is more than 5 seconds between 2 states, the exercise fails.
+  if duration_states >= 5:
     print("UNSUCCESSFUL: The executing of this exercise was false or took too long!!")
     quit()   
   
@@ -201,7 +201,7 @@ def compare_general(inputFrame, current_state, duration_states, reps, count_reps
 
     if current_state == len(correct_ex_jpg) and reps + 1 == count_reps:
       # show last frame before ending.
-      time.sleep(2)
+      time.sleep(1)
 
   # Go to next state
   if current_state == len(correct_ex_jpg):
